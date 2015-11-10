@@ -21,10 +21,12 @@ cursor = cnx.cursor()
 query = ("SELECT devid, address, name,NOW() as datevalue FROM sensor")
 cursor.execute(query)
 sensors = dict()
+names = dict()
 datev=""
 
 for row in cursor:
    sensors[str(row[1])] = str(row[0])
+   names[str(row[1])] = str(row[2])
    datev=row[3]
    
 print "Sensors from database:"
@@ -58,10 +60,13 @@ for dev in device_folder:
    if (lines[0].strip()[-3:] != 'YES'):
       lines=read_temp_raw(device_file)
    temp_line = lines[1]
+   print "\nLINE to parse: "+ temp_line
    m = re.match(r"([0-9a-f]{2} ){9}t=([+-]?[0-9]+)", temp_line)
-   if m.group(2) != 8500:
+   print "Temp value: " + m.group(2)
+   if m.group(2) != "85000":
      temp = str(float(m.group(2)) /1000.0)
      if(sensors[device_id]):
+     	print "sensor name: " + names[device_id]
      	print "insert with id: " + sensors[device_id]
      	print "insert with serial: " + device_id
         query = ("insert into temperatures (date,sensor,temp_c,sensor_serial) values ('"+str(datev)+"',"+sensors[device_id]+","+temp+",'"+device_id+"')")
@@ -70,5 +75,8 @@ for dev in device_folder:
         cnx.commit()
      else:
         print "Sensor not found from database" 
+   else:
+     print "Sensor invalid 85000 value. Not registered"
+      
        
 cnx.close()
