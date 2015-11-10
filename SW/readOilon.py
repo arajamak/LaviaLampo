@@ -1,9 +1,40 @@
 #!/usr/bin/python
 import RPi.GPIO as GPIO
 import time
+import mysql.connector
 
 GPIO.setmode(GPIO.BOARD)
 print GPIO.VERSION
+
+db_config = {
+      'user': 'valvoja',
+      'password': 'valvoja',
+      'host': '127.0.0.1',
+      'database': 'LAVIATEMP',
+      'raise_on_warnings': True,
+    }
+try:
+   cnx = mysql.connector.connect(**db_config)
+except mysql.Error as err:
+   print err.errno + " database error Exiting"
+   exit.sys()
+
+cursor = cnx.cursor()
+
+query = ("SELECT devid, name,NOW() as datevalue FROM relays")
+cursor.execute(query)
+relays = dict()
+names = dict()
+st = {'ON':1, "OFF":0}
+datev=""
+
+for row in cursor:
+   relays[str(row[1])] = str(row[0])
+   names[str(row[0])] = str(row[1])
+   datev=row[2]
+   
+print "Relays from database:"
+print relays
 
 #set powersubly pin
 # use + V directly from raspberry
@@ -38,6 +69,13 @@ GPIO.cleanup()
 # Print result
 print "OILON: " + poltin
 print "VASTUS: " + vastus
+
+query = ("insert into relaysstates (relay_state,date,state) values ('"+str(datev)+"',"+str(relays['POLTIN'])+","+str(st['poltin']) )
+print query
+cursor.execute(query)
+cnx.commit()
+
+cnx.close()
 
 # prtint to log file
 # POLTIN:0;ALARM:0;TIME:Sat Oct 13 19:55:01 2012
