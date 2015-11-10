@@ -70,7 +70,7 @@ GPIO.cleanup()
 print "OILON: " + poltin
 print "VASTUS: " + vastus
 
-query = ("insert into relaysstates (relay_state,date,state) values ('"+str(datev)+"',"+str(relays['POLTIN'])+","+str(st['poltin']) )
+query = ("insert into status (timestamp,devid,state) values ('"+str(datev)+"',"+str(relays['POLTIN'])+","+str(st[poltin])+")" )
 print query
 cursor.execute(query)
 cnx.commit()
