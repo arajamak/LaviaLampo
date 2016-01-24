@@ -361,7 +361,9 @@ sub CheckPost()
   my $totalCount = shift;
   print "Reply content: $reply" if ($Debug==1);
 
-  my ($sum) = $reply =~ /.*SUM:\s(\d+(:?\.\d+)?)/g;
+  #my ($sum) = $reply =~ /.*SUM:\s(\d+(:?\.\d+)?)/g;
+  # outside sensor sum is negative
+  my ($sum) = $reply =~ /.*SUM:\s(-?\d+(:?\.\d+)?)/g;
   print "TOTAL SUM in reply: $sum\n";
   print "TOTAL SUM count: $totalCount\n";
  
